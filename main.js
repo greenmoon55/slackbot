@@ -4,13 +4,13 @@ var os = require('os');
 var request = require('request');
 var token = ''
 var bot = controller.spawn({
-  token: 'xoxb-17927817201-E6R6OjfKHtqctMw0qo6eUjG7'
+  token: 'xoxb-17927817201-eEzmpenf09mk5X0dJkDo0O5V'
 })
 bot.startRTM(function(err,bot,payload) {
   if (err) {
     throw new Error('Could not connect to Slack');
   }
-  bot.say({text: 'Hi! I am Baymax'})
+  bot.say({text: 'Hi! I am Baymax', channel: 'C0HT969S5'})
 });
 
 controller.hears(['hello','hi'],'direct_message,direct_mention,mention',function(bot, message) {
@@ -171,6 +171,13 @@ var app = express();
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
+});
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // for parsing application/json
+app.post('/', function (req, res) {
+  console.log(req.body);
+  bot.say({text: JSON.stringify(req.body, null, 2), channel: 'C0HT969S5'})
+  res.send('POST request to the homepage');
 });
 
 app.listen(3000, function () {
