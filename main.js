@@ -3,14 +3,21 @@ var controller = Botkit.slackbot();
 var os = require('os');
 var request = require('request');
 var token = ''
+
+var headers = {
+  'Authorization': process.env.DAOCLOUD_TOKEN
+}
+
+var channel = process.env.SLACK_CHANNEL_ID
+
 var bot = controller.spawn({
-  token: 'xoxb-17927817201-eEzmpenf09mk5X0dJkDo0O5V'
+  token: process.env.SLACK_TOKEN
 })
 bot.startRTM(function(err,bot,payload) {
   if (err) {
     throw new Error('Could not connect to Slack');
   }
-  bot.say({text: 'Hi! I am Baymax', channel: 'C0HT969S5'})
+  bot.say({text: 'Hi! I am Baymax', channel: channel})
 });
 
 controller.hears(['hello','hi'],'direct_message,direct_mention,mention',function(bot, message) {
@@ -99,23 +106,23 @@ controller.hears(['uptime','identify yourself','who are you','what is your name'
 
 });
 
-controller.hears(['daocloud_token (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
-  var matches = message.text.match(/daocloud_token (.*)/i);
-  var name = matches[1];
-  headers = {'Authorization': name, 'Content-Type': 'application/json'}
-  bot.reply(message, 'OK!')
-})
-
-var headers = {
-  'Authorization': token
-}
-
 controller.hears(['list apps'], 'direct_message,direct_mention,mention', function(bot, message) {
   request({url: 'https://openapi.daocloud.io/v1/apps', headers: headers}, function (error, response, body) {
       //if (!error && response.statusCode == 200) {
 
         json = JSON.parse(body)
-        bot.reply(message, JSON.stringify(json))
+        str = ''
+        var i;
+        for (i = 0; i < json['app'].length; i++) {
+          var app = json['app'][i];
+          str += app['name']
+          str += ' ' + app['state']
+          str += ' ' + app['release_name']
+          str += ' ' + app['last_operated_at']
+          str += '\n'
+        }
+        console.log(JSON.stringify(json))
+        bot.reply(message, str)
       //}
   })
 })
@@ -176,7 +183,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // for parsing application/json
 app.post('/', function (req, res) {
   console.log(req.body);
-  bot.say({text: JSON.stringify(req.body, null, 2), channel: 'C0HT969S5'})
+  bot.say({text: JSON.stringify(req.body, null, 2), channel: channel})
   res.send('POST request to the homepage');
 });
 
