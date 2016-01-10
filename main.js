@@ -161,7 +161,7 @@ controller.hears(['app info (.*)'], 'direct_message,direct_mention,mention', fun
   var matches = message.text.match(/app info (.*)/i);
   var name = matches[1];
   console.log(name)
-  id = getAppIdByName(name, function(id) {
+  getAppIdByName(name, function(id) {
     console.log(id)
     request({url: 'https://openapi.daocloud.io/v1/apps/'+id, headers: headers}, function (error, response, body) {
           json = JSON.parse(body)
@@ -174,7 +174,7 @@ controller.hears(['app redeploy (.*)'], 'direct_message,direct_mention,mention',
   var matches = message.text.match(/app redeploy (\S*) (\S*)/i);
   var name = matches[1];
   console.log(name)
-  id = getAppIdByName(name, function(id) {
+  getAppIdByName(name, function(id) {
     var release_name = matches[2];
     console.log(id);
     console.log(release_name);
