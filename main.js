@@ -110,8 +110,8 @@ controller.hears(['list apps'], 'direct_message,direct_mention,mention', functio
   request({url: 'https://openapi.daocloud.io/v1/apps', headers: headers}, function (error, response, body) {
       //if (!error && response.statusCode == 200) {
 
-        json = JSON.parse(body)
-        str = ''
+        var json = JSON.parse(body)
+        var str = ''
         var i;
         for (i = 0; i < json['app'].length; i++) {
           var app = json['app'][i];
@@ -128,30 +128,62 @@ controller.hears(['list apps'], 'direct_message,direct_mention,mention', functio
 })
 controller.hears(['list build-flows'], 'direct_message,direct_mention,mention', function(bot, message) {
   request({url: 'https://openapi.daocloud.io/v1/build-flows', headers: headers}, function (error, response, body) {
-        json = JSON.parse(body)
-        bot.reply(message, JSON.stringify(json))
+        var json = JSON.parse(body)
+        var i;
+        var buildflows = json['build_flows']
+        var str = '';
+        for (i = 0; i < buildflows.length; i++) {
+          var buildflow = buildflows[i]
+          str += buildflow['name']
+          str += ' ' + buildflow['status']
+          str += ' ' + buildflow['repo']
+          str += '\n'
+        }
+        console.log(JSON.stringify(json))
+        bot.reply(message, str)
   })
 })
+function getAppIdByName(name, callback) {
+  request({url: 'https://openapi.daocloud.io/v1/apps', headers: headers}, function (error, response, body) {
+        var json = JSON.parse(body)
+        var i;
+        for (i = 0; i < json['app'].length; i++) {
+          var app = json['app'][i];
+          console.log(app['name'])
+          if (app['name'] == name) {
+            callback(app['id'])
+          }
+        }
+        console.log(JSON.stringify(json))
+  })
+}
 controller.hears(['app info (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
   var matches = message.text.match(/app info (.*)/i);
-  id = matches[1];
-  request({url: 'https://openapi.daocloud.io/v1/apps/'+id, headers: headers}, function (error, response, body) {
-        json = JSON.parse(body)
-        bot.reply(message, JSON.stringify(json))
+  var name = matches[1];
+  console.log(name)
+  id = getAppIdByName(name, function(id) {
+    console.log(id)
+    request({url: 'https://openapi.daocloud.io/v1/apps/'+id, headers: headers}, function (error, response, body) {
+          json = JSON.parse(body)
+          bot.reply(message, JSON.stringify(json))
+    })
   })
 })
 
 controller.hears(['app redeploy (.*)'], 'direct_message,direct_mention,mention', function(bot, message) {
   var matches = message.text.match(/app redeploy (\S*) (\S*)/i);
-  var id = matches[1];
-  var release_name = matches[2];
-  console.log(id);
-  console.log(release_name);
-  request.post({url: 'https://openapi.daocloud.io/v1/apps/'+id+'/actions/redeploy', headers: headers, json:{'release_name': release_name}}, function (error, response, body) {
-      console.log(body)
-      console.log(error)
-      console.log(response)
-        bot.reply(message, body)
+  var name = matches[1];
+  console.log(name)
+  id = getAppIdByName(name, function(id) {
+    var release_name = matches[2];
+    console.log(id);
+    console.log(release_name);
+    request.post({url: 'https://openapi.daocloud.io/v1/apps/'+id+'/actions/redeploy', headers: headers, json:{'release_name': release_name}}, function (error, response, body) {
+        console.log(body)
+        console.log(error)
+        console.log(response)
+          bot.reply(message, body)
+    })
   })
 })
 
