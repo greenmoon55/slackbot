@@ -217,7 +217,8 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json()); // for parsing application/json
 app.post('/', function (req, res) {
   console.log(req.body);
-  bot.say({text: JSON.stringify(req.body, null, 2), channel: channel})
+  var str = prettyjson.render(req.body, {'noColor': true, 'defaultIndentation': 4})
+  bot.say({text: str, channel: channel})
   res.send('POST request to the homepage');
 });
 
