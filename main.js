@@ -2,6 +2,7 @@ var Botkit = require('botkit');
 var controller = Botkit.slackbot();
 var os = require('os');
 var request = require('request');
+var prettyjson = require('prettyjson')
 var token = ''
 
 var headers = {
@@ -165,7 +166,8 @@ controller.hears(['app info (.*)'], 'direct_message,direct_mention,mention', fun
     console.log(id)
     request({url: 'https://openapi.daocloud.io/v1/apps/'+id, headers: headers}, function (error, response, body) {
           json = JSON.parse(body)
-          bot.reply(message, JSON.stringify(json))
+          var str = prettyjson.render(json, {'noColor': true, 'defaultIndentation': 4})
+          bot.reply(message, str)
     })
   })
 })
