@@ -182,8 +182,8 @@ controller.hears(['app redeploy (.*)'], 'direct_message,direct_mention,mention',
     console.log(release_name);
     request.post({url: 'https://openapi.daocloud.io/v1/apps/'+id+'/actions/redeploy', headers: headers, json:{'release_name': release_name}}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-          json = JSON.parse(body)
-          var str = prettyjson.render(json, {'noColor': true, 'defaultIndentation': 4})
+          console.log(body)
+          var str = prettyjson.render(body, {'noColor': true, 'defaultIndentation': 4})
           bot.reply(message, str)
         } else {
           bot.reply(message, 'error')
