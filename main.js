@@ -17,7 +17,7 @@ bot.startRTM(function(err,bot,payload) {
   if (err) {
     throw new Error('Could not connect to Slack');
   }
-  bot.say({text: 'Hi! I am Baymax', channel: channel})
+  bot.say({text: 'Hi! I\'m Daocloud Bot! ', channel: channel})
 });
 
 controller.hears(['hello','hi'],'direct_message,direct_mention,mention',function(bot, message) {
